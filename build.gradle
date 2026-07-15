@@ -1,0 +1,68 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '4.1.0'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+// ================ 调试配置 ================
+//
+// 方式 1 — IDEA 顶部工具栏：点击 Debug 按钮即可
+//    任务选择：Gradle → Tasks → application → bootRun → Debug
+//
+// 方式 2 — 命令行终端：
+//    ./gradlew bootRun --debug-jvm    （Spring Boot 原生支持，监听 5005）
+//
+// 方式 3 — 本任务（bootRunDebug），终端运行即可：
+//    ./gradlew bootRunDebug
+//    然后 IDEA 创建 "Remote JVM Debug" 配置，端口 5005，点 Debug 连接
+
+bootRun {
+	jvmArgs = [
+		"-Dfile.encoding=UTF-8",
+		"-XX:+UseG1GC",
+		"-XX:+HeapDumpOnOutOfMemoryError",
+		"-XX:HeapDumpPath=build/heapdump.hprof"
+	]
+}
+
+tasks.register("bootRunDebug") {
+	description = "以调试模式启动 Spring Boot（JDWP 监听 5005，suspend=y）"
+	group = "application"
+}
+
+// 当执行 bootRunDebug 时，给 bootRun 加上 JDWP 参数
+tasks.named("bootRun") {
+	if (gradle.startParameter.taskNames.contains("bootRunDebug")) {
+		jvmArgs.addAll(["-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005"])
+	}
+}
+
+gradle.taskGraph.beforeTask { task ->
+	if (task.name == "bootRun" && gradle.startParameter.taskNames.contains("bootRunDebug")) {
+		println "===== 调试模式已启动 ====="
+		println "请在 IDEA 中创建 Remote JVM Debug 配置（端口 5005），然后连接"
+	}
+}

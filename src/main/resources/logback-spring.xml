@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- ============ 从 application.properties 读取的变量 ============ -->
+    <springProperty scope="context" name="appName" source="spring.application.name" defaultValue="demo"/>
+    <springProperty scope="context" name="logPath" source="logging.file.path" defaultValue="logs"/>
+    <springProperty scope="context" name="maxHistory" source="logback.max-history" defaultValue="30"/>
+    <springProperty scope="context" name="maxFileSize" source="logback.max-file-size" defaultValue="100MB"/>
+    <springProperty scope="context" name="totalSizeCap" source="logback.total-size-cap" defaultValue="3GB"/>
+
+    <!-- ============ 控制台输出（带颜色高亮） ============ -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) --- [%15.15t] %cyan(%-40.40logger{39}) : %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ============ 滚动文件输出（按日期+大小切割、gz 压缩） ============ -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logPath}/${appName}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${logPath}/archive/${appName}.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxHistory>${maxHistory}</maxHistory>
+            <maxFileSize>${maxFileSize}</maxFileSize>
+            <totalSizeCap>${totalSizeCap}</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%t] %logger{39} : %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ============ 错误日志独立文件（仅 ERROR 级别及以上） ============ -->
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logPath}/${appName}-error.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${logPath}/archive/${appName}-error.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxHistory>${maxHistory}</maxHistory>
+            <maxFileSize>${maxFileSize}</maxFileSize>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%t] %logger{39} : %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ============ Spring Profile 配置 ============ -->
+
+    <!-- dev / 默认：控制台 + 文件日志 -->
+    <springProfile name="dev | default">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE"/>
+            <appender-ref ref="ERROR_FILE"/>
+        </root>
+        <!-- 应用包路径单独开 DEBUG 方便调试 -->
+        <logger name="com.example.demo" level="DEBUG" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE"/>
+            <appender-ref ref="ERROR_FILE"/>
+        </logger>
+    </springProfile>
+
+    <!-- prod：仅文件，不输出到控制台 -->
+    <springProfile name="prod">
+        <root level="INFO">
+            <appender-ref ref="FILE"/>
+            <appender-ref ref="ERROR_FILE"/>
+        </root>
+    </springProfile>
+
+</configuration>
