@@ -1,0 +1,97 @@
+﻿# ─── OS & Editor ──────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.user
+*.userosscache
+*.sln.docstates
+
+# ─── Python ───────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ─── Node.js / Frontend ──────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp/
+.pnp.js
+.eslintcache
+*.tsbuildinfo
+.next/
+out/
+dist/
+build/
+.cache/
+.env
+.env.local
+.env.*.local
+
+# ─── Rust ─────────────────────────────────────────────────────
+target/
+**/*.rs.bk
+
+# ─── Go ──────────────────────────────────────────────────────
+vendor/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# ─── Java / Kotlin ───────────────────────────────────────────
+*.class
+*.jar
+*.war
+*.nar
+target/
+!gradle-wrapper.jar
+.gradle/
+build/
+
+# ─── Secrets / Config ────────────────────────────────────────
+*.key
+*.pem
+*.cert
+config/local.*
+secrets.*
+credentials.*
+service-account.*
+.env
+.env.*
+!env.example
+!.env.example
+
+# ─── Logs / Temp ─────────────────────────────────────────────
+*.log
+*.tmp
+*.temp
+logs/
